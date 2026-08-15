@@ -22,31 +22,25 @@
   </div>
   <p class="poll-card__badge">{{ poll.indecision_badge }}</p>
 
-  {% if show_results %}
-    <ul class="option-list" id="option-results" aria-live="polite">
-      {% for option in results.options %}
-        <li class="option-result{% if option.id == voted_option_id %} option-result--mine{% endif %}">
-          <span class="option-result__fill" style="width: {{ option.percent }}%; background: var(--opt-{{ forloop.counter0 }});"></span>
-          <span class="option-result__label">{{ option.text }}{% if option.id == voted_option_id %} ✓{% endif %}</span>
-          <span class="option-result__percent">%{{ option.percent }}</span>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <ul class="option-list" id="option-vote-list">
-      {% for option in poll.options.all %}
-        <li>
+  <ul class="option-list" id="option-list">
+    {% for option in poll.options.all %}
+      <li>
+        {% if can_vote %}
           <form method="post" action="{% url 'polls:vote' poll.public_id %}" class="option-vote-form">
             {% csrf_token %}
             <input type="hidden" name="option_id" value="{{ option.id }}">
-            <button type="submit" class="option-row--votable" style="--opt-color: var(--opt-{{ forloop.counter0 }});">
-              {{ option.text }}
+            <button type="submit" class="option-row option-row--votable{% if reveal_results %} option-row--results{% endif %}" style="--opt-color: var(--opt-{{ forloop.counter0 }});">
+              {% include "partials/option_row_content.html" with index=forloop.counter0 %}
             </button>
           </form>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+        {% else %}
+          <div class="option-row option-row--results{% if option.id == voted_option_id %} option-row--mine{% endif %}" style="--opt-color: var(--opt-{{ forloop.counter0 }});">
+            {% include "partials/option_row_content.html" with index=forloop.counter0 %}
+          </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
 
   <p class="poll-card__votes">{{ poll.total_votes }} kişi oy verdi</p>
 

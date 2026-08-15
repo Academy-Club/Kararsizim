@@ -48,15 +48,25 @@ def detail(request, public_id):
     voter_key = get_voter_key(request)
     voted_option_id = selectors.get_voted_option_id(poll, user=user, voter_key=voter_key)
     is_owner = user is not None and poll.author_id == user.id
-    show_results = not poll.is_open or voted_option_id is not None or is_owner
+
+    # can_vote ve reveal_results birbirinden bağımsızdır: anket sahibi henüz
+    # oy vermemişken bile sonuçları görebilir (Bölüm 6), ama bu onun oy
+    # verme hakkını (Bölüm 6: "yazar kendi anketine oy verebilir") elinden
+    # almamalı — bu yüzden iki bayrak aynı anda true olabilir.
+    can_vote = poll.is_open and voted_option_id is None
+    reveal_results = not poll.is_open or voted_option_id is not None or is_owner
+
+    if reveal_results:
+        percentages = selectors.compute_percentages(list(poll.options.all()))
+        for option in poll.options.all():
+            option.percent = percentages[option.id]
 
     context = {
         "poll": poll,
         "voted_option_id": voted_option_id,
-        "show_results": show_results,
+        "can_vote": can_vote,
+        "reveal_results": reveal_results,
     }
-    if show_results:
-        context["results"] = selectors.build_poll_results(poll, user=user, voter_key=voter_key)
     return render(request, "polls/detail.html", context)
 
 

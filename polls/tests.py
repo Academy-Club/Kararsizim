@@ -168,6 +168,21 @@ class PollVoteTests(TestCase):
         )
         self.assertEqual(response.status_code, 403)
 
+    def test_owner_sees_vote_form_and_can_vote_on_own_poll(self):
+        """Regresyon: anket sahibi henüz oy vermemişse sonuçları görebilmeli
+        AMA oy verme formu da gösterilmeli (yazar kendi anketine oy verebilir)."""
+        self.client.force_login(self.author)
+        detail_response = self.client.get(reverse("polls:detail", args=[self.poll.public_id]))
+        self.assertContains(detail_response, "option-vote-form")
+        self.assertContains(detail_response, "%")  # sahip yüzdeleri de görebilmeli
+
+        vote_response = self.client.post(
+            reverse("polls:vote", args=[self.poll.public_id]), {"option_id": self.option_a.id}
+        )
+        self.assertRedirects(vote_response, self.poll.get_absolute_url())
+        self.option_a.refresh_from_db()
+        self.assertEqual(self.option_a.vote_count, 1)
+
     def test_race_condition_falls_back_to_integrity_error(self):
         """Pre-check'i atlatan eşzamanlı bir isteği simüle eder: DB constraint'i
         yine de AlreadyVotedError'a çevrilmeli, ikinci sayaç artışı olmamalı."""

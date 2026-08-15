@@ -1,0 +1,3 @@
+{% if reveal_results %}<span class="option-row__fill" style="width: {{ option.percent }}%; background: var(--opt-{{ index }});"></span>{% endif %}
+<span class="option-row__label">{{ option.text }}{% if option.id == voted_option_id %} ✓{% endif %}</span>
+{% if reveal_results %}<span class="option-row__percent">%{{ option.percent }}</span>{% endif %}

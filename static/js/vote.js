@@ -58,36 +58,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderDecisionBar(data.options, data.total);
 
-    const oldList =
-      document.getElementById("option-vote-list") || document.getElementById("option-results");
+    const oldList = document.getElementById("option-list");
     if (!oldList) return;
 
     const newList = document.createElement("ul");
     newList.className = "option-list";
-    newList.id = "option-results";
+    newList.id = "option-list";
     newList.setAttribute("aria-live", "polite");
 
     data.options.forEach((option, index) => {
       const li = document.createElement("li");
-      li.className =
-        "option-result" + (option.id === data.voted_option_id ? " option-result--mine" : "");
+      const row = document.createElement("div");
+      row.className =
+        "option-row option-row--results" +
+        (option.id === data.voted_option_id ? " option-row--mine" : "");
+      row.style.setProperty("--opt-color", "var(--opt-" + index + ")");
 
       const fill = document.createElement("span");
-      fill.className = "option-result__fill";
+      fill.className = "option-row__fill";
       fill.style.width = option.percent + "%";
       fill.style.background = "var(--opt-" + index + ")";
 
       const label = document.createElement("span");
-      label.className = "option-result__label";
+      label.className = "option-row__label";
       label.textContent = option.text + (option.id === data.voted_option_id ? " ✓" : "");
 
       const percent = document.createElement("span");
-      percent.className = "option-result__percent";
+      percent.className = "option-row__percent";
       percent.textContent = "%" + option.percent;
 
-      li.appendChild(fill);
-      li.appendChild(label);
-      li.appendChild(percent);
+      row.appendChild(fill);
+      row.appendChild(label);
+      row.appendChild(percent);
+      li.appendChild(row);
       newList.appendChild(li);
     });
 
