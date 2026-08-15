@@ -21,11 +21,12 @@ def validate_username_not_forbidden(value):
 
 class User(AbstractUser):
     username = models.CharField(
+        "kullanıcı adı",
         max_length=20,
         unique=True,
         validators=[USERNAME_REGEX_VALIDATOR, validate_username_not_forbidden],
     )
-    email = models.EmailField(unique=True)
+    email = models.EmailField("e-posta", unique=True)
 
     def __str__(self):
         return self.username

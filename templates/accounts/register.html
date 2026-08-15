@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Kayıt ol · Kararsızım{% endblock %}
+
+{% block content %}
+<main class="auth-page">
+  <h1>Kayıt ol</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <p class="error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    {% if form.non_field_errors %}
+      <div class="field">
+        {% for error in form.non_field_errors %}
+          <p class="error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <button type="submit" class="btn btn--primary">Kayıt ol</button>
+  </form>
+  <p>Zaten hesabın var mı? <a href="{% url 'accounts:login' %}">Giriş yap</a></p>
+</main>
+{% endblock %}

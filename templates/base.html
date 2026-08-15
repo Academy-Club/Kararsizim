@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
+  {% include "partials/header.html" %}
+  {% include "partials/toast.html" %}
   {% block content %}{% endblock %}
+  <script src="{% static 'js/toast.js' %}"></script>
 </body>
 </html>

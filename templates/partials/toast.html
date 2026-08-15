@@ -1,0 +1,7 @@
+{% if messages %}
+<div class="toast-container" aria-live="polite">
+  {% for message in messages %}
+    <div class="toast">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
