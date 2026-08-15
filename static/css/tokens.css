@@ -1,0 +1,38 @@
+:root {
+  /* zemin ve metin */
+  --paper:      #FAF9FF;   /* sayfa arka planı, hafif lila beyaz */
+  --surface:    #FFFFFF;   /* kart yüzeyi */
+  --ink:        #16143A;   /* ana metin, koyu mor-lacivert */
+  --muted:      #6B6890;   /* ikincil metin */
+  --line:       rgba(22, 20, 58, 0.10); /* kenarlık */
+
+  /* canlı renkler — seçenek renkleri de bunlardan gelir */
+  --violet:     #5B3DF5;   /* birincil aksiyon */
+  --pink:       #FF3D8B;
+  --mint:       #00D19A;
+  --sun:        #FFC531;
+  --sky:        #2BB3FF;
+
+  /* seçenek sırasına göre sabit renkler */
+  --opt-0: var(--violet);
+  --opt-1: var(--pink);
+  --opt-2: var(--mint);
+  --opt-3: var(--sun);
+  --opt-4: var(--sky);
+
+  /* durum */
+  --danger:     #E5484D;
+
+  /* gölge: griye değil, mora çalar */
+  --shadow-sm: 0 2px 8px rgba(91, 61, 245, 0.08);
+  --shadow-md: 0 8px 24px rgba(91, 61, 245, 0.12);
+
+  /* biçim */
+  --radius-card: 20px;
+  --radius-pill: 999px;
+  --radius-input: 14px;
+
+  /* aralık ölçeği */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
+}
