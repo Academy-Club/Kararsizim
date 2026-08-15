@@ -85,6 +85,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+AUTH_USER_MODEL = "accounts.User"
+
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
@@ -94,6 +96,11 @@ DATABASE_URL = os.getenv("DATABASE_URL", "") or f"sqlite:///{BASE_DIR / 'db.sqli
 DATABASES = {
     "default": dj_database_url.parse(DATABASE_URL, conn_max_age=0)
 }
+
+# Supabase transaction pooler prepared statement'ları desteklemez (Bölüm 11.1).
+if DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+    DATABASES["default"].setdefault("OPTIONS", {})["prepare_threshold"] = None
 
 
 # Password validation
