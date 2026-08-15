@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.db.models import Count, Q
 from django.utils import timezone
 
-from .models import Poll
+from .models import Poll, Vote
 
 RECENT_VOTES_WINDOW = timedelta(days=7)
 
@@ -39,3 +39,46 @@ def list_user_polls(user):
 
 def count_polls_created_today(user):
     return Poll.objects.filter(author=user, created_at__date=timezone.localdate()).count()
+
+
+def get_voted_option_id(poll, *, user, voter_key):
+    if user is not None and user.is_authenticated:
+        vote = Vote.objects.filter(poll=poll, user=user).only("option_id").first()
+    else:
+        vote = (
+            Vote.objects.filter(poll=poll, voter_key=voter_key, user__isnull=True)
+            .only("option_id")
+            .first()
+        )
+    return vote.option_id if vote else None
+
+
+def compute_percentages(options):
+    total = sum(option.vote_count for option in options)
+    if total == 0:
+        return {option.id: 0 for option in options}
+    percentages = {option.id: round(option.vote_count / total * 100) for option in options}
+    diff = 100 - sum(percentages.values())
+    if diff:
+        largest = max(options, key=lambda option: option.vote_count)
+        percentages[largest.id] += diff
+    return percentages
+
+
+def build_poll_results(poll, *, user, voter_key):
+    options = list(poll.options.all())
+    percentages = compute_percentages(options)
+    return {
+        "total": poll.total_votes,
+        "options": [
+            {
+                "id": option.id,
+                "text": option.text,
+                "count": option.vote_count,
+                "percent": percentages[option.id],
+            }
+            for option in options
+        ],
+        "voted_option_id": get_voted_option_id(poll, user=user, voter_key=voter_key),
+        "is_open": poll.is_open,
+    }

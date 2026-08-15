@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load humanize static %}
 
 {% block title %}{{ poll.question }} · Kararsızım{% endblock %}
 
@@ -22,14 +22,48 @@
   </div>
   <p class="poll-card__badge">{{ poll.indecision_badge }}</p>
 
-  <ul class="option-list">
-    {% for option in poll.options.all %}
-      <li class="option-row">
-        <span class="option-row__dot" style="background: var(--opt-{{ forloop.counter0 }});"></span>
-        {{ option.text }}
-      </li>
-    {% endfor %}
-  </ul>
+  {% if show_results %}
+    <ul class="option-list" id="option-results" aria-live="polite">
+      {% for option in results.options %}
+        <li class="option-result{% if option.id == voted_option_id %} option-result--mine{% endif %}">
+          <span class="option-result__fill" style="width: {{ option.percent }}%; background: var(--opt-{{ forloop.counter0 }});"></span>
+          <span class="option-result__label">{{ option.text }}{% if option.id == voted_option_id %} ✓{% endif %}</span>
+          <span class="option-result__percent">%{{ option.percent }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <ul class="option-list" id="option-vote-list">
+      {% for option in poll.options.all %}
+        <li>
+          <form method="post" action="{% url 'polls:vote' poll.public_id %}" class="option-vote-form">
+            {% csrf_token %}
+            <input type="hidden" name="option_id" value="{{ option.id }}">
+            <button type="submit" class="option-row--votable" style="--opt-color: var(--opt-{{ forloop.counter0 }});">
+              {{ option.text }}
+            </button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
   <p class="poll-card__votes">{{ poll.total_votes }} kişi oy verdi</p>
+
+  {% if user.is_authenticated and poll.author_id == user.id %}
+    <div class="poll-detail__owner-actions">
+      {% if poll.is_open %}
+        <form method="post" action="{% url 'polls:close' poll.public_id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn--secondary">Anketi kapat</button>
+        </form>
+      {% endif %}
+      <a class="btn btn--secondary" href="{% url 'polls:delete' poll.public_id %}">Anketi sil</a>
+    </div>
+  {% endif %}
 </main>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{% static 'js/vote.js' %}" defer></script>
 {% endblock %}

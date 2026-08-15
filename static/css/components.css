@@ -82,6 +82,7 @@
 
 .decision-bar__segment {
   height: 100%;
+  transition: width 450ms cubic-bezier(.2, .8, .2, 1);
 }
 
 .poll-card__badge {
@@ -123,21 +124,75 @@
   padding: 0;
 }
 
-.option-row {
+.option-row--votable {
   display: flex;
   align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--opt-color, var(--violet));
+  border-radius: var(--radius-input);
+  margin-bottom: var(--sp-2);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.option-row--votable:hover {
+  background: color-mix(in srgb, var(--opt-color, var(--violet)) 8%, var(--surface));
+}
+
+.option-result {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--line);
   border-radius: var(--radius-input);
   margin-bottom: var(--sp-2);
+  overflow: hidden;
+  background: var(--surface);
 }
 
-.option-row__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+.option-result--mine {
+  border: 2px solid var(--ink);
+}
+
+.option-result__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  opacity: 0.25;
+  transition: width 450ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.option-result__label {
+  position: relative;
+  font-weight: 600;
+}
+
+.option-result__percent {
+  position: relative;
+  font-family: "JetBrains Mono", monospace;
   flex-shrink: 0;
+}
+
+.poll-detail__owner-actions {
+  display: flex;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decision-bar__segment,
+  .option-result__fill {
+    transition: none;
+  }
 }
 
 .option-rows {
