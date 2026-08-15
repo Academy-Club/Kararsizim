@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Anket oluştur · Kararsızım{% endblock %}
+
+{% block content %}
+<main class="auth-page">
+  <h1>Anket oluştur</h1>
+  <form method="post" id="poll-form" novalidate>
+    {% csrf_token %}
+    <div class="field">
+      <label for="{{ form.question.id_for_label }}">{{ form.question.label }}</label>
+      {{ form.question }}
+      {% for error in form.question.errors %}<p class="error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="field">
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+      {{ form.description }}
+      {% for error in form.description.errors %}<p class="error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div class="field">
+      <label>Seçenekler</label>
+      <div class="option-rows" id="option-rows">
+        <div class="option-row-input">
+          <input type="text" name="option" maxlength="80" class="option-input" placeholder="Seçenek 1" required>
+        </div>
+        <div class="option-row-input">
+          <input type="text" name="option" maxlength="80" class="option-input" placeholder="Seçenek 2" required>
+        </div>
+      </div>
+      <button type="button" id="add-option" class="btn btn--secondary">Seçenek ekle</button>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="field">
+        {% for error in form.non_field_errors %}<p class="error">{{ error }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn--primary">Anketi yayınla</button>
+  </form>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{% static 'js/poll-form.js' %}" defer></script>
+{% endblock %}

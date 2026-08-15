@@ -2,10 +2,9 @@ from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from .forms import LoginForm, RegisterForm
-
-CREATE_POLL_PATH = "/anket/olustur/"
 
 
 def register(request):
@@ -32,5 +31,5 @@ class CustomLoginView(LoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["show_create_poll_notice"] = self.get_redirect_url() == CREATE_POLL_PATH
+        context["show_create_poll_notice"] = self.get_redirect_url() == reverse("polls:create")
         return context

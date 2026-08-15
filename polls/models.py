@@ -54,6 +54,21 @@ class Poll(models.Model):
     def get_absolute_url(self):
         return f"/anket/{self.public_id}/"
 
+    @property
+    def indecision_badge(self):
+        if self.total_votes == 0:
+            return "İlk oyu sen ver"
+        options = list(self.options.all())
+        if len(options) < 2:
+            return "Karar net"
+        top_two = sorted(options, key=lambda option: option.vote_count, reverse=True)[:2]
+        diff_percent = abs(top_two[0].vote_count - top_two[1].vote_count) / self.total_votes * 100
+        if diff_percent <= 5:
+            return "Kalabalık da kararsız"
+        if diff_percent <= 20:
+            return "Az farkla önde"
+        return "Karar net"
+
 
 class Option(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name="options")

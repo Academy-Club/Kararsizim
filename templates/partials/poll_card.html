@@ -1,0 +1,21 @@
+{% load humanize %}
+<article class="poll-card">
+  <a class="poll-card__link" href="{{ poll.get_absolute_url }}">
+    <h2 class="poll-card__question">{{ poll.question }}</h2>
+  </a>
+  <p class="poll-card__meta">
+    <a href="{% url 'polls:profile' poll.author.username %}">@{{ poll.author.username }}</a>
+    · {{ poll.created_at|naturaltime }}
+    {% if poll.status == "closed" %}· <span class="poll-card__status">Kapalı</span>{% endif %}
+  </p>
+
+  <div class="decision-bar" role="img" aria-label="{{ poll.indecision_badge }}">
+    {% if poll.total_votes > 0 %}
+      {% for option in poll.options.all %}
+        <span class="decision-bar__segment" style="width: {% widthratio option.vote_count poll.total_votes 100 %}%; background: var(--opt-{{ forloop.counter0 }});"></span>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <p class="poll-card__badge">{{ poll.indecision_badge }}</p>
+  <p class="poll-card__votes">{{ poll.total_votes }} kişi oy verdi</p>
+</article>

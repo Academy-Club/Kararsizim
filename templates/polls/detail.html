@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ poll.question }} · Kararsızım{% endblock %}
+
+{% block content %}
+<main class="page poll-detail">
+  <p class="poll-card__meta">
+    <a href="{% url 'polls:profile' poll.author.username %}">@{{ poll.author.username }}</a>
+    · {{ poll.created_at|naturaltime }}
+    {% if poll.status == "closed" %}· <span class="poll-card__status">Kapalı</span>{% endif %}
+  </p>
+  <h1>{{ poll.question }}</h1>
+  {% if poll.description %}<p class="poll-detail__description">{{ poll.description }}</p>{% endif %}
+
+  <div class="decision-bar" role="img" aria-label="{{ poll.indecision_badge }}">
+    {% if poll.total_votes > 0 %}
+      {% for option in poll.options.all %}
+        <span class="decision-bar__segment" style="width: {% widthratio option.vote_count poll.total_votes 100 %}%; background: var(--opt-{{ forloop.counter0 }});"></span>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <p class="poll-card__badge">{{ poll.indecision_badge }}</p>
+
+  <ul class="option-list">
+    {% for option in poll.options.all %}
+      <li class="option-row">
+        <span class="option-row__dot" style="background: var(--opt-{{ forloop.counter0 }});"></span>
+        {{ option.text }}
+      </li>
+    {% endfor %}
+  </ul>
+  <p class="poll-card__votes">{{ poll.total_votes }} kişi oy verdi</p>
+</main>
+{% endblock %}

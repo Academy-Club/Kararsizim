@@ -1,5 +1,29 @@
 {% extends "base.html" %}
 
+{% block title %}Kararsızım{% endblock %}
+
 {% block content %}
-<h1>Kararsızım</h1>
+<main class="page">
+  <nav class="tabs">
+    <a class="tabs__link {% if active_tab == 'yeni' %}tabs__link--active{% endif %}" href="?sekme=yeni">Yeni</a>
+    <a class="tabs__link {% if active_tab == 'populer' %}tabs__link--active{% endif %}" href="?sekme=populer">Popüler</a>
+    <a class="tabs__link {% if active_tab == 'kapananlar' %}tabs__link--active{% endif %}" href="?sekme=kapananlar">Kapananlar</a>
+  </nav>
+
+  {% if page_obj.object_list %}
+    <div class="poll-grid">
+      {% for poll in page_obj %}
+        {% include "partials/poll_card.html" %}
+      {% endfor %}
+    </div>
+    {% if page_obj.has_next %}
+      <a class="btn btn--secondary" href="?sekme={{ active_tab }}&page={{ page_obj.next_page_number }}">Daha fazla göster</a>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <p>Henüz anket yok. İlk kararsızlığını sen paylaş.</p>
+      <a class="btn btn--primary" href="{% url 'polls:create' %}">Anket oluştur</a>
+    </div>
+  {% endif %}
+</main>
 {% endblock %}
