@@ -1,8 +1,17 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
   font-family: "Inter", system-ui, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  font-weight: 800;
 }
 
 :focus-visible {
@@ -11,7 +20,10 @@ body {
 }
 
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: var(--sp-3) var(--sp-5);
   border-radius: var(--radius-pill);
   font-weight: 600;
@@ -23,7 +35,7 @@ body {
 
 .btn--primary {
   background: var(--violet);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .btn--secondary {
@@ -34,29 +46,51 @@ body {
 
 .site-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   padding: var(--sp-4) var(--sp-5);
   border-bottom: 1px solid var(--line);
 }
 
 .site-header__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
   font-weight: 800;
   font-size: 20px;
   color: var(--ink);
   text-decoration: none;
 }
 
+.site-header__logo img {
+  width: 24px;
+  height: 24px;
+}
+
 .site-header__nav {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
 }
 
 .site-header__user {
   font-weight: 600;
   color: var(--muted);
+}
+
+@media (max-width: 480px) {
+  .site-header {
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .site-header__nav .btn {
+    padding: var(--sp-2) var(--sp-4);
+    font-size: 14px;
+  }
 }
 
 .auth-page {
@@ -71,7 +105,7 @@ body {
 }
 
 .info-box {
-  background: rgba(91, 61, 245, 0.08);
+  background: color-mix(in srgb, var(--violet) 8%, transparent);
   color: var(--ink);
   padding: var(--sp-3) var(--sp-4);
   border-radius: var(--radius-input);
@@ -91,11 +125,14 @@ body {
 }
 
 .field input {
+  min-height: 44px;
   padding: var(--sp-3);
   border-radius: var(--radius-input);
   border: 1px solid var(--line);
   font-size: 16px;
   font-family: inherit;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .field .error {
@@ -108,16 +145,19 @@ body {
   position: fixed;
   bottom: var(--sp-5);
   right: var(--sp-5);
+  left: var(--sp-5);
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: var(--sp-2);
   z-index: 100;
 }
 
 .toast {
   background: var(--ink);
-  color: #fff;
+  color: var(--on-brand);
   padding: var(--sp-3) var(--sp-4);
   border-radius: var(--radius-input);
   box-shadow: var(--shadow-md);
+  max-width: 100%;
 }

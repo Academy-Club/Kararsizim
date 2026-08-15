@@ -5,6 +5,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Kararsızım{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Sen sor, kalabalık karar versin.{% endblock %}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kararsızım">
+  <meta property="og:title" content="{% block og_title %}Kararsızım{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Sen sor, kalabalık karar versin.{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo.svg' %}{% endblock %}">
+
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/logo.svg' %}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/components.css' %}">

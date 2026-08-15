@@ -102,6 +102,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!form) return;
     event.preventDefault();
 
+    const buttons = page.querySelectorAll(".option-vote-form button");
+    buttons.forEach((button) => {
+      button.disabled = true;
+    });
+
     fetch(form.action, {
       method: "POST",
       headers: {
@@ -117,8 +122,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (data.options) {
           renderResults(data);
+        } else {
+          buttons.forEach((button) => {
+            button.disabled = false;
+          });
         }
       })
-      .catch(() => showToast("Bağlantı hatası, tekrar dene."));
+      .catch(() => {
+        showToast("Bağlantı hatası, tekrar dene.");
+        buttons.forEach((button) => {
+          button.disabled = false;
+        });
+      });
   });
 });

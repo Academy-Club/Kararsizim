@@ -2,6 +2,9 @@
 {% load humanize static %}
 
 {% block title %}{{ poll.question }} · Kararsızım{% endblock %}
+{% block meta_description %}{% firstof poll.description "Sen sor, kalabalık karar versin." %}{% endblock %}
+{% block og_title %}{{ poll.question }}{% endblock %}
+{% block og_description %}{% firstof poll.description "Sen sor, kalabalık karar versin." %}{% endblock %}
 
 {% block content %}
 <main class="page poll-detail">
@@ -22,7 +25,7 @@
   </div>
   <p class="poll-card__badge">{{ poll.indecision_badge }}</p>
 
-  <ul class="option-list" id="option-list">
+  <ul class="option-list" id="option-list" aria-live="polite">
     {% for option in poll.options.all %}
       <li>
         {% if can_vote %}

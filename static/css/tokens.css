@@ -5,6 +5,7 @@
   --ink:        #16143A;   /* ana metin, koyu mor-lacivert */
   --muted:      #6B6890;   /* ikincil metin */
   --line:       rgba(22, 20, 58, 0.10); /* kenarlık */
+  --on-brand:   #FFFFFF;   /* renkli/koyu zeminlerdeki metin (buton, toast) */
 
   /* canlı renkler — seçenek renkleri de bunlardan gelir */
   --violet:     #5B3DF5;   /* birincil aksiyon */
@@ -20,8 +21,8 @@
   --opt-3: var(--sun);
   --opt-4: var(--sky);
 
-  /* durum */
-  --danger:     #E5484D;
+  /* durum — --paper/--surface üzerinde en az 4.5:1 kontrast için koyulaştırıldı */
+  --danger:     #C7282E;
 
   /* gölge: griye değil, mora çalar */
   --shadow-sm: 0 2px 8px rgba(91, 61, 245, 0.08);

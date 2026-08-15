@@ -11,6 +11,9 @@
 }
 
 .tabs__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: var(--sp-2) var(--sp-4);
   border-radius: var(--radius-pill);
   color: var(--muted);
@@ -131,6 +134,7 @@
   justify-content: space-between;
   gap: var(--sp-3);
   width: 100%;
+  min-height: 44px;
   text-align: left;
   padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--line);
@@ -149,6 +153,11 @@
 
 .option-row--votable:not(.option-row--results):hover {
   background: color-mix(in srgb, var(--opt-color, var(--violet)) 8%, var(--surface));
+}
+
+.option-row--votable:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .option-row--mine {
@@ -202,6 +211,8 @@
 
 .option-input {
   flex: 1;
+  min-height: 44px;
+  min-width: 0;
   padding: var(--sp-3);
   border-radius: var(--radius-input);
   border: 1px solid var(--line);

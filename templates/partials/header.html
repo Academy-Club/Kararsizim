@@ -1,5 +1,9 @@
+{% load static %}
 <header class="site-header">
-  <a class="site-header__logo" href="{% url 'polls:index' %}">Kararsızım</a>
+  <a class="site-header__logo" href="{% url 'polls:index' %}">
+    <img src="{% static 'img/logo.svg' %}" alt="" width="24" height="24">
+    Kararsızım
+  </a>
   <nav class="site-header__nav">
     {% if user.is_authenticated %}
       <span class="site-header__user">@{{ user.username }}</span>
