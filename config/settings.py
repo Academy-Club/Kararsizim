@@ -42,6 +42,15 @@ CSRF_TRUSTED_ORIGINS = [
 
 VOTER_KEY_SALT = os.getenv("VOTER_KEY_SALT", "dev-only-change-me")
 
+# Production'da HTTPS zorunlu (Bölüm 11.2 / 12). DEBUG yerine Vercel'in kendi
+# ortamına özgü VERCEL değişkenine bakılır — yereldeki DEBUG=False testleri
+# (ör. statik dosya doğrulaması) bu blok yüzünden HTTP'de kırılmasın diye.
+if os.getenv("VERCEL"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+
 
 # Application definition
 
