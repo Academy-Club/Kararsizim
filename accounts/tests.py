@@ -65,3 +65,31 @@ class AuthFlowTests(TestCase):
 
         response = self.client.post(reverse("accounts:logout"))
         self.assertRedirects(response, "/")
+
+
+class LoginRateLimitTests(TestCase):
+    """Regresyon: /giris/ ucuna aynı kullanıcı adıyla art arda başarısız
+    denemeler bir noktadan sonra engellenmeli (kaba kuvvet koruması)."""
+
+    def setUp(self):
+        User.objects.create_user(
+            username="hedefkullanici", email="hedef@example.com", password="guclu-parola-123"
+        )
+        self.url = reverse("accounts:login")
+
+    def test_repeated_failed_logins_for_same_username_are_blocked(self):
+        for _ in range(5):
+            response = self.client.post(
+                self.url, {"username": "hedefkullanici", "password": "yanlis-parola"}
+            )
+            self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            self.url, {"username": "hedefkullanici", "password": "yanlis-parola"}
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_login_page_itself_is_not_rate_limited(self):
+        for _ in range(10):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 200)

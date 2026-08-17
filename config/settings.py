@@ -42,6 +42,23 @@ CSRF_TRUSTED_ORIGINS = [
 
 VOTER_KEY_SALT = os.getenv("VOTER_KEY_SALT", "dev-only-change-me")
 
+# Vercel serverless fonksiyonları arasında bellek paylaşılmaz (LocMemCache işe
+# yaramaz), Redis de projeye eklenmiyor — bu yüzden login rate limit sayaçları
+# DB tabanlı cache'te tutulur (bkz. accounts/migrations, "django_cache" tablosu).
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    }
+}
+
+# django-ratelimit, DatabaseCache'te atomik increment olmadığı için E003 hatası
+# veriyor (bkz. https://django-ratelimit.readthedocs.io). Projede Redis/Memcached
+# yok (CLAUDE.md). Login rate limiti burada kaba kuvveti caydırmak için
+# best-effort bir önlem — kesin bir güvenlik sınırı değil; yoğun eşzamanlılıkta
+# sayaç birkaç isteği kaçırabilir, bu uygulama için kabul edilebilir bir risk.
+SILENCED_SYSTEM_CHECKS = ["django_ratelimit.E003"]
+
 # Production'da HTTPS zorunlu (Bölüm 11.2 / 12). DEBUG yerine Vercel'in kendi
 # ortamına özgü VERCEL değişkenine bakılır — yereldeki DEBUG=False testleri
 # (ör. statik dosya doğrulaması) bu blok yüzünden HTTP'de kırılmasın diye.
@@ -62,6 +79,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django_ratelimit",
     "accounts",
     "polls",
 ]

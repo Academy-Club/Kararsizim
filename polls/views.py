@@ -75,6 +75,7 @@ def vote(request, public_id):
     poll = get_object_or_404(selectors.get_poll_detail_queryset(), public_id=public_id)
     user = request.user if request.user.is_authenticated else None
     voter_key = get_voter_key(request)
+    is_owner = user is not None and poll.author_id == user.id
 
     error_message = None
     status_code = 200
@@ -101,7 +102,9 @@ def vote(request, public_id):
             request.session["voted_polls"] = voted_polls
 
     if _wants_json(request):
-        payload = selectors.build_poll_results(poll, user=user, voter_key=voter_key)
+        payload = selectors.build_poll_results(
+            poll, user=user, voter_key=voter_key, is_owner=is_owner
+        )
         if error_message:
             payload["error"] = error_message
         return JsonResponse(payload, status=status_code)
@@ -116,7 +119,10 @@ def results(request, public_id):
     poll = get_object_or_404(selectors.get_poll_detail_queryset(), public_id=public_id)
     user = request.user if request.user.is_authenticated else None
     voter_key = get_voter_key(request)
-    return JsonResponse(selectors.build_poll_results(poll, user=user, voter_key=voter_key))
+    is_owner = user is not None and poll.author_id == user.id
+    return JsonResponse(
+        selectors.build_poll_results(poll, user=user, voter_key=voter_key, is_owner=is_owner)
+    )
 
 
 @login_required

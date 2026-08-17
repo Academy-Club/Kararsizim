@@ -210,12 +210,12 @@ class PollPercentageRoundingTests(TestCase):
 
     def test_percentages_sum_to_100_with_three_way_split(self):
         poll = self._poll_with_votes([1, 1, 1])
-        payload = selectors.build_poll_results(poll, user=None, voter_key="test")
+        payload = selectors.build_poll_results(poll, user=None, voter_key="test", is_owner=True)
         self.assertEqual(sum(option["percent"] for option in payload["options"]), 100)
 
     def test_percentages_sum_to_100_with_seven_votes(self):
         poll = self._poll_with_votes([3, 2, 2])
-        payload = selectors.build_poll_results(poll, user=None, voter_key="test")
+        payload = selectors.build_poll_results(poll, user=None, voter_key="test", is_owner=True)
         self.assertEqual(sum(option["percent"] for option in payload["options"]), 100)
 
 
@@ -254,3 +254,62 @@ class PollCloseDeleteTests(TestCase):
         self.client.force_login(self.other_user)
         response = self.client.post(reverse("polls:delete", args=[self.poll.public_id]))
         self.assertEqual(response.status_code, 403)
+
+
+class PollResultsVisibilityTests(TestCase):
+    """Regresyon: oy vermeden /sonuc/ ucuna GET atarak yüzdeleri önceden
+    görmek mümkün olmamalı (Bölüm 6: 'oy vermeden önce yüzdeler gizlidir')."""
+
+    def setUp(self):
+        self.author = create_user(username="sonucsahibi", email="sonuc@example.com")
+        self.poll = Poll.objects.create(author=self.author, question="Bugün ne yapsak acaba?")
+        self.option_a = Option.objects.create(poll=self.poll, text="A", position=0, vote_count=3)
+        self.option_b = Option.objects.create(poll=self.poll, text="B", position=1, vote_count=1)
+        self.poll.total_votes = 4
+        self.poll.save(update_fields=["total_votes"])
+
+    def test_results_endpoint_hides_percentages_before_voting(self):
+        response = self.client.get(reverse("polls:results", args=[self.poll.public_id]))
+        data = response.json()
+        self.assertFalse(data["reveal_results"])
+        self.assertEqual(data["total"], 4)
+        for option in data["options"]:
+            self.assertIsNone(option["percent"])
+            self.assertIsNone(option["count"])
+
+    def test_results_endpoint_reveals_percentages_after_voting(self):
+        self.client.post(
+            reverse("polls:vote", args=[self.poll.public_id]), {"option_id": self.option_a.id}
+        )
+        response = self.client.get(reverse("polls:results", args=[self.poll.public_id]))
+        data = response.json()
+        self.assertTrue(data["reveal_results"])
+        for option in data["options"]:
+            self.assertIsNotNone(option["percent"])
+
+    def test_results_endpoint_reveals_for_closed_poll_without_voting(self):
+        self.poll.status = Poll.STATUS_CLOSED
+        self.poll.save(update_fields=["status"])
+        response = self.client.get(reverse("polls:results", args=[self.poll.public_id]))
+        data = response.json()
+        self.assertTrue(data["reveal_results"])
+
+    def test_results_endpoint_reveals_for_owner_without_voting(self):
+        self.client.force_login(self.author)
+        response = self.client.get(reverse("polls:results", args=[self.poll.public_id]))
+        data = response.json()
+        self.assertTrue(data["reveal_results"])
+
+    def test_invalid_option_vote_does_not_leak_percentages(self):
+        other_poll = Poll.objects.create(author=self.author, question="Başka bir soru mu bu?")
+        other_option = Option.objects.create(poll=other_poll, text="X", position=0)
+        response = self.client.post(
+            reverse("polls:vote", args=[self.poll.public_id]),
+            {"option_id": other_option.id},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertFalse(data["reveal_results"])
+        for option in data["options"]:
+            self.assertIsNone(option["percent"])

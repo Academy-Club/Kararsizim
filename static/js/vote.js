@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!ok && data.error) {
           showToast(data.error);
         }
-        if (data.options) {
+        if (data.reveal_results) {
           renderResults(data);
         } else {
           buttons.forEach((button) => {

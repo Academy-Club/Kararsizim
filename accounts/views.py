@@ -3,6 +3,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 
 from .forms import LoginForm, RegisterForm
 
@@ -24,6 +26,10 @@ def register(request):
     return render(request, "accounts/register.html", {"form": form})
 
 
+# Tek IP'nin çok sayıda hesabı denemesine (kaba kuvvet) ve tek bir hesabın
+# çok sayıda IP'den hedef alınmasına (dağıtık deneme) karşı iki ayrı limit.
+@method_decorator(ratelimit(key="ip", rate="20/5m", method="POST"), name="post")
+@method_decorator(ratelimit(key="post:username", rate="5/5m", method="POST"), name="post")
 class CustomLoginView(LoginView):
     template_name = "accounts/login.html"
     authentication_form = LoginForm

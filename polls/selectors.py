@@ -65,20 +65,24 @@ def compute_percentages(options):
     return percentages
 
 
-def build_poll_results(poll, *, user, voter_key):
+def build_poll_results(poll, *, user, voter_key, is_owner=False):
+    voted_option_id = get_voted_option_id(poll, user=user, voter_key=voter_key)
+    reveal_results = not poll.is_open or voted_option_id is not None or is_owner
+
     options = list(poll.options.all())
-    percentages = compute_percentages(options)
+    percentages = compute_percentages(options) if reveal_results else None
     return {
         "total": poll.total_votes,
         "options": [
             {
                 "id": option.id,
                 "text": option.text,
-                "count": option.vote_count,
-                "percent": percentages[option.id],
+                "count": option.vote_count if reveal_results else None,
+                "percent": percentages[option.id] if reveal_results else None,
             }
             for option in options
         ],
-        "voted_option_id": get_voted_option_id(poll, user=user, voter_key=voter_key),
+        "voted_option_id": voted_option_id,
         "is_open": poll.is_open,
+        "reveal_results": reveal_results,
     }
